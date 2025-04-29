@@ -33,5 +33,27 @@ namespace HelloWorld.Controllers
 
             return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
         }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(int id, Product updatedProduct)
+        {
+            var product = Products.FirstOrDefault(p => p.Id == id);
+            if (product == null) return NotFound();
+
+            product.Name = updatedProduct.Name;
+            product.Price = updatedProduct.Price;
+
+            return NoContent();
+        }
+
+        [HttpDelete("{id}")]
+        public IActionResult Delete(int id)
+        {
+            var product = Products.FirstOrDefault(p => p.Id == id);
+            if (product == null) return NotFound();
+
+            Products.Remove(product);
+            return NoContent();
+        }
     }
 }

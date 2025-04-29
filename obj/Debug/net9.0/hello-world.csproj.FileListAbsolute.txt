@@ -64,3 +64,4 @@
 /Users/jds2023/repo/learning/dotnet/HelloWorld/obj/Debug/net9.0/hello-world.pdb
 /Users/jds2023/repo/learning/dotnet/HelloWorld/obj/Debug/net9.0/hello-world.genruntimeconfig.cache
 /Users/jds2023/repo/learning/dotnet/HelloWorld/obj/Debug/net9.0/ref/hello-world.dll
+/Users/jds2023/repo/learning/dotnet/HelloWorld/obj/Debug/net9.0/hello-world.sourcelink.json
