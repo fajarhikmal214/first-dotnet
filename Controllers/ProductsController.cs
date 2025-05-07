@@ -8,7 +8,7 @@ using HelloWorld.Dtos;
 namespace HelloWorld.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/products")]
     public class ProductsController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -30,10 +30,11 @@ namespace HelloWorld.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetById(int id)
         {
-            var product = await _context.Products.FindAsync(id); 
+            var product = await _context.Products.Include(p => p.Category).FirstOrDefaultAsync(); 
             if (product == null) return NotFound();
-            
-            return Ok(product);
+
+            var productDto = _mapper.Map<ProductDto>(product);
+            return Ok(productDto);
         }
 
         [HttpPost]
