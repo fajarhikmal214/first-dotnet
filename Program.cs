@@ -37,6 +37,10 @@ builder.Services.AddScoped<TokenService>();
 var connection = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string" + "'DefaultConnection' not found.");
 builder.Services.AddDbContext<AppDbContext> (options => options.UseSqlServer(connection));
 
+builder.WebHost.ConfigureKestrel(serverOptions => {
+    serverOptions.ListenAnyIP(5000);
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
