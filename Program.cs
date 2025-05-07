@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddAuthorization();
 builder.Services.AddOpenApi();
+builder.Services.AddAutoMapper(typeof(Program));
 
 var connection = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string" + "'DefaultConnection' not found.");
 builder.Services.AddDbContext<AppDbContext> (options => options.UseSqlServer(connection));

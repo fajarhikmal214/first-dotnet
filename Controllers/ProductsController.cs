@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 using HelloWorld.Data;
 using HelloWorld.Models;
+using HelloWorld.Dtos;
 
 namespace HelloWorld.Controllers
 {
@@ -10,16 +12,19 @@ namespace HelloWorld.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public ProductsController(AppDbContext context) {
+        public ProductsController(AppDbContext context, IMapper mapper) {
             _context = context;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Product>> GetAll() {
-            var products = await _context.Products.ToListAsync();
+        public async Task<ActionResult<IEnumerable<ProductDto>>> GetAll() {
+            var products = await _context.Products.Include(p => p.Category).ToListAsync();
+            var productDtos = _mapper.Map<List<ProductDto>>(products);
 
-            return products;
+            return Ok(productDtos);
         }
         
         [HttpGet("{id}")]
