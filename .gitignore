@@ -49,3 +49,6 @@ local.settings.json
 # Build directories
 /dist/
 /out/
+
+# env
+appsettings.Production.json
