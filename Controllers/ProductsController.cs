@@ -1,4 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using HelloWorld.Data;
+using HelloWorld.Models;
 
 namespace HelloWorld.Controllers
 {
@@ -6,53 +9,71 @@ namespace HelloWorld.Controllers
     [Route("api/[controller]")]
     public class ProductsController : ControllerBase
     {
-        public static readonly List<Product> Products = new List<Product>
-        {
-            new Product { Id = 1, Name = "Laptop", Price = 10.50M },
-            new Product { Id = 2, Name = "Smartphone", Price = 20.00M },
-            new Product { Id = 3, Name = "Tablet", Price = 15.00M }
-        };
+        private readonly AppDbContext _context;
+
+        public ProductsController(AppDbContext context) {
+            _context = context;
+        }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Product>> GetAll() => Ok(Products);
+        public async Task<IEnumerable<Product>> GetAll() {
+            var products = await _context.Products.ToListAsync();
+
+            return products;
+        }
         
         [HttpGet("{id}")]
-        public ActionResult<Product> GetById(int id)
+        public async Task<ActionResult<Product>> GetById(int id)
         {
-            var product = Products.FirstOrDefault(p => p.Id == id);
-            
+            var product = await _context.Products.FindAsync(id); 
             if (product == null) return NotFound();
+            
             return Ok(product);
         }
 
         [HttpPost]
-        public ActionResult<Product> Create(Product product)
+        public async Task<ActionResult<Product>> Create(Product product)
         {
-            product.Id = Products.Max(p => p.Id) + 1;
-            Products.Add(product);
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
 
             return CreatedAtAction(nameof(GetById), new { id = product.Id }, product);
         }
 
         [HttpPut("{id}")]
-        public IActionResult Update(int id, Product updatedProduct)
+        public async Task<IActionResult> Update(int id, Product updatedProduct)
         {
-            var product = Products.FirstOrDefault(p => p.Id == id);
+            var product = await _context.Products.FindAsync(id);
             if (product == null) return NotFound();
 
-            product.Name = updatedProduct.Name;
-            product.Price = updatedProduct.Price;
+            try
+            {
+                product.Name = updatedProduct.Name;
+                product.Price = updatedProduct.Price;
 
-            return NoContent();
+                await _context.SaveChangesAsync();
+
+                return NoContent();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                return StatusCode(500, "A conncurent error eccoured.");
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, $"Unexpected error: {e.Message}");
+            }
         }
 
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var product = Products.FirstOrDefault(p => p.Id == id);
+            var product = await _context.Products.FindAsync(id);
             if (product == null) return NotFound();
 
-            Products.Remove(product);
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync(); 
+
             return NoContent();
         }
     }
